@@ -1,0 +1,154 @@
+--[[
+ .____                  ________ ___.    _____                           __                
+ |    |    __ _______   \_____  \\_ |___/ ____\_ __  ______ ____ _____ _/  |_  ___________ 
+ |    |   |  |  \__  \   /   |   \| __ \   __\  |  \/  ___// ___\\__  \\   __\/  _ \_  __ \
+ |    |___|  |  // __ \_/    |    \ \_\ \  | |  |  /\___ \\  \___ / __ \|  | (  <_> )  | \/
+ |_______ \____/(____  /\_______  /___  /__| |____//____  >\___  >____  /__|  \____/|__|   
+         \/          \/         \/    \/                \/     \/     \/                   
+          \_Welcome to LuaObfuscator.com   (Alpha 0.2.5) ~  Much Love, Ferib 
+
+]]--
+
+local v0=string.char;local v1=string.byte;local v2=string.sub;local v3=bit32 or bit ;local v4=v3.bxor;local v5=table.concat;local v6=table.insert;local function v7(v8,v9)local v11={};for v15=1179 -(111 + 1067) , #v8 do v6(v11,v0(v4(v1(v2(v8,v15,v15 + (1 -0) )),v1(v2(v9,(1233 -(814 + 418)) + ((v15-(1 + 0))% #v9) ,1 + ((v15-(3 -2))% #v9) + (4 -3) )))%(327 -(52 + 19)) ));end return v5(v11);end local v0=string.char;local v1=string.byte;local v2=string.sub;local v3=bit32 or bit ;local v4=v3.bxor;local v5=table.concat;local v6=table.insert;local function v7(v8,v9)local v11={};for v15=1179 -(111 + 1067) , #v8 do v6(v11,v0(v4(v1(v2(v8,v15,v15 + (1 -0) )),v1(v2(v9,(1233 -(814 + 418)) + ((v15-(1 + 0))% #v9) ,1 + ((v15-(3 -2))% #v9) + (4 -3) )))%(327 -(52 + 19)) ));end return v5(v11);end for v12,v13 in pairs(getactors()) do syn.run_on_actor(v13,'[[
+            local HitBoxes={}--hitbex list used for later
+            --oringal hitboxes used to disable the script
+            local OriginalHB=function()
+                local a={["Left Leg"]={radius=0.1,precedence=4,size=Vector3.new(1,2,1)},["Right Arm"]={radius=0.1,precedence=3,size=Vector3.new(1,2,1)},Head={radius=0.1,precedence=1,size=Vector3.new(1,1,1)},Torso={radius=0.1,precedence=2,size=Vector3.new(2,2,1)},["Right Leg"]={radius=0.1,precedence=4,size=Vector3.new(1,2,1)},["Left Arm"]={radius=0.1,precedence=3,size=Vector3.new(1,2,1)}}
+                return a
+            end
+            for _,v in pairs(getgc(true))do
+                if type(v)=="table"then
+                    for i,c in pairs(v)do
+                        if i=="Head"and type(c)=="table"and c.size then
+                            HitBoxes[#HitBoxes+1]=v--we have hitbox size for 2 teams ?!?!?! wtf pf
+                        end
+                    end
+                end
+            end
+            local UpdateHB=function(target,size)--set size for hitbox
+                for _,v in pairs(HitBoxes)do
+                    v[target].size=Vector3.new(size,size,size)
+                    v[target].radius=size
+                end
+            end
+            local ReturnHB=function()--set all hitboxes to oringal sizes
+                for i,v in pairs(HitBoxes)do
+                    for i2,v2 in pairs(v)do
+                        for i3 in pairs(v2)do
+                            HitBoxes[i][i2][i3]=OriginalHB()[i2][i3]
+                        end
+                    end
+                end
+            end
+            local GetMaterials=function()--get new table with all materials
+                local Matierals={"Asphalt","Basalt","Brick","Cobblestone","Concrete","Corroded Metal","Cracked Lava","Diamond Plate","Fabric","Foil","ForceField","Glacier","Glass","Granite","Grass","Ground","Ice","Leafy Grass","Limestone","Marble","Metal","Mud","Neon","Pavement","Pebble","Plastic","Rock","Salt","Sand","Sandstone","Slate","Smooth Plastic","Snow","Wood","Wood Planks"}
+                return Matierals
+            end
+            local GetR6Parts=function(all)--get table with r6 parts
+                local Parts
+                if all then
+                    Parts={"All","Head","Torso","Right Arm","Left Arm","Right Leg","Left Leg"}
+                else
+                    Parts={"Head","Torso","Right Arm","Left Arm","Right Leg","Left Leg"}
+                end
+                return Parts
+            end
+            local GetEnemys=function()--simple ass get enemys
+                local players={}
+                local characters={}
+                local enemyteam
+                for _,v in pairs(game.Players:GetChildren())do
+                    if v.Team~=game.Players.LocalPlayer.Team then
+                        enemyteam=tostring(v.TeamColor)
+                        players[#players+1]=v
+                    end
+                end
+                if not enemyteam then
+                    enemyteam="Bright orange"
+                    if game.Players.LocalPlayer.Team.Name=="Ghosts"then
+                        enemyteam="Bright blue"
+                    end
+                end
+                for _,v in pairs(game.Workspace.Players[enemyteam]:GetChildren())do
+                    characters[#characters+1]=v
+                end
+                return{characters,players}
+            end
+            local Options={--optinos folder (dont worry u dont have to set these we have a ui now)
+                Enabled=false,
+                Target={"Head"},
+                Size=0,
+                Color=Color3.new(),
+                Material="Asphalt",
+                Transparency=0,
+                Show=false,
+            }
+            --epic coasting ui lib
+            _G.UILib=_G.UILib or loadstring(game:HttpGet("https://raw.githubusercontent.com/The3Bakers4565/Spicy-Bagel/main/Functions/UI/Coasting.lua"))()
+            local Main=_G.UILib:CreateTab("Hit Box")--tabs
+            local MainSection=Main:CreateSection("Hitbox Expander")--section 1
+            local ConfigSection=Main:CreateSection("Config")--section 2
+            MainSection:CreateToggle("Enabled",function(x)
+                Options.Enabled=x
+                ReturnHB()--always reset hb size even if we enable it
+                if x then
+                    for _,v in pairs(Options.Target)do
+                        UpdateHB(v,Options.Size)--update hb size
+                    end
+                end
+            end)
+            MainSection:CreateSlider("Size",1,15,7,false,function(x)
+                Options.Size=x
+                if Options.Enabled then
+                    ReturnHB()
+                    for _,v in pairs(Options.Target)do
+                        UpdateHB(v,Options.Size)
+                    end
+                end
+            end)
+            MainSection:CreateDropdown("Target",GetR6Parts(true),2,function(x)
+                if x=="All"then
+                    Options.Target=GetR6Parts()--if we select all we get every part from the r6 table
+                else
+                    Options.Target={x}--keep part inside table
+                end
+                if Options.Enabled then
+                    ReturnHB()
+                    for _,v in pairs(Options.Target)do
+                        UpdateHB(v,Options.Size)
+                    end
+                end
+            end)
+            ConfigSection:CreateToggle("Show",function(x)
+                Options.Show=x
+            end)
+            ConfigSection:CreateColorPicker("Color",Color3.new(1,0,0),function(x)
+                Options.Color=x
+            end)
+            ConfigSection:CreateSlider("Transparency",0,1,.5,true,function(x)
+                Options.Transparency=x
+            end)
+            ConfigSection:CreateDropdown("Matieral",GetMaterials(),1,function(x)
+                Options.Material=x
+            end)
+            game.RunService.RenderStepped:Connect(function()
+                if Options.Enabled and Options.Show then
+                    for _,v in pairs(GetEnemys()[1])do--in every enemy character
+                        for _,c in pairs(Options.Target)do--for every part selected (mainly used for all)
+                            local cham=Instance.new("Part")--add part
+                            cham.Transparency=1-Options.Transparency--set up transparency
+                            cham.Size=Vector3.new(Options.Size,Options.Size,Options.Size)--set up size
+                            cham.Color=Options.Color--set up color
+                            cham.Material=Options.Material--set up material
+                            cham.CanCollide=false--we dont wanna stand on enemy O_o
+                            cham.CFrame=v[c].CFrame--set the part to the part we want (makes scince shut up)
+                            cham.Parent=v[c]--wecan use ingoremisc etc but we are lazy
+                            coroutine.wrap(function()
+                                game.RunService.RenderStepped:Wait()
+                                cham:Destroy()--destroy after a frame because we make new part on frame
+                            end)()
+                        end
+                    end
+                end
+            end)
+        ]]');end game:GetService(v7("\200\87\232\60\239\70\251\9\238\74","\155\35\137\78")):SetCore(v7("\28\81\242\24\1\91\232\21\41\93\255\29\59\93\243\18","\79\52\156\124"),{[v7("\241\25\158\217\223","\165\112\234\181\186\38\20\110")]=v7("\102\64\15\71\11\99\18\24\11\96\7\82\67\64\56\85\74\70\90\16\24\2\95\22\27\21","\43\33\107\34"),[v7("\66\23\94\9","\22\114\38\125")]="https://discord.gg/8w9QX8dJ",[v7("\239\110\17\169\97\82\196\117","\171\27\99\200\21\59")]=99});game:GetService(v7("\235\21\124\216\159\172\202\38\104\195","\184\97\29\170\235\201")):SetCore(v7("\127\224\214\15\98\234\204\2\74\236\219\10\88\236\215\5","\44\133\184\107"),{[v7("\77\13\189\64\124","\25\100\201\44")]=v7("\224\204\214\79\145\85\180\229\203\206\77","\169\162\160\38\229\48\148"),[v7("\111\192\207\6","\59\165\183\114\93")]=v7("\9\81\245\122\92\219\5\219\37\30\198\127\80\207\71\224\43\76\225","\74\62\133\19\57\191\37\143"),[v7("\140\150\77\244\215\89\167\141","\200\227\63\149\163\48")]=243 -144 });setclipboard("https://discord.gg/8w9QX8dJ");
